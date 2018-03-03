@@ -12,7 +12,10 @@
 </head>
 
 <body>
-  
+<form>
+
+  <input type="file" id="profilePhotoFileUpload">
+  <input type= "button" onclick="uplod()" value="上传文件">
   <div id="main">
 	<h1>开始Bmob之旅!</h1>
 
@@ -29,8 +32,22 @@
 
 	//Bmob.initialize("Application ID", "REST API Key");
     Bmob.initialize("f684324b01fc137e70a06526caf0e7e8", "2c470f92c811fee18bc8324928c27603");
+	function uplod(){debugger;
+	  var fileUploadControl = $("#profilePhotoFileUpload")[0];
+        if (fileUploadControl.files.length > 0) {
+        var file = fileUploadControl.files[0];
+        var name = "logo.jpg";
+        var file = new Bmob.File(name, file);     
+		file.save().then(function(obj) {debugger;
+  //alert(obj.url());
+}, function(error) {
+  // the save failed.
+});
 	
-	var TestObject = Bmob.Object.extend("users");
+	}
+	}
+	
+	/*var TestObject = Bmob.Object.extend("users");
     var testObject = new TestObject();
       testObject.save({username: "bar"}, {
       success: function(object) {
