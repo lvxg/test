@@ -20,6 +20,7 @@
         <input type="button" onclick="uplod()" value="上传文件123">
         <div id="main">
             <h1>开始Bmob之旅!</h1>
+			<input type='button' onclick="send()" value="发短信">
 
             <div style="display:none" class="error">
                 看起来保存对象时出现问题, 当调用<code>Bmob.initialize</code> 的时候，记得要先设置 Application ID 和 REST API Key 哦，亲！
@@ -33,7 +34,15 @@
         <script type="text/javascript">
             //Bmob.initialize("Application ID", "REST API Key");
             Bmob.initialize("f684324b01fc137e70a06526caf0e7e8", "2c470f92c811fee18bc8324928c27603");
-
+              function send() {
+			  Bmob.Sms.requestSmsCode({"mobilePhoneNumber": "15164253719"} ).then(function(obj) {
+  alert("smsId:"+obj.smsId); //
+}, function(err){
+  alert("发送失败:"+err);
+});
+			  
+			  }
+			   
             function uplod() {
                 debugger;
                 var fileUploadControl = $("#profilePhotoFileUpload")[0];
