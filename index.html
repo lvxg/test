@@ -3,595 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍅 番茄钟 - 专注工作</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Bmob 数据查询示例</title>
+    <!-- 引入 Bmob JavaScript SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/hydrogen-js-sdk@2.1.0/dist/Bmob-2.1.0.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 50%, #d94444 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            transition: background 0.5s ease;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #f5f7fa;
         }
-
-        body.break-mode {
-            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 50%, #0984e3 100%);
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 30px;
-            padding: 40px;
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 100%;
-            backdrop-filter: blur(10px);
-        }
-
         .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #333;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .tomato-icon {
-            font-size: 3rem;
-            animation: bounce 2s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .mode-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            background: #f0f0f0;
-            padding: 5px;
-            border-radius: 15px;
-        }
-
-        .mode-tab {
-            flex: 1;
-            padding: 12px 20px;
-            border: none;
-            background: transparent;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #666;
-        }
-
-        .mode-tab.active {
-            background: #ff6b6b;
-            color: white;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
-        }
-
-        body.break-mode .mode-tab.active {
-            background: #4ecdc4;
-            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
-        }
-
-        .timer-display {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .timer-circle {
-            width: 250px;
-            height: 250px;
-            margin: 0 auto;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .progress-ring {
-            transform: rotate(-90deg);
-        }
-
-        .progress-ring-circle {
-            stroke: #e0e0e0;
-            stroke-width: 8;
-            fill: transparent;
-        }
-
-        .progress-ring-circle-active {
-            stroke: #ff6b6b;
-            stroke-width: 8;
-            fill: transparent;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.35s;
-        }
-
-        body.break-mode .progress-ring-circle-active {
-            stroke: #4ecdc4;
-        }
-
-        .time-text {
-            position: absolute;
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #333;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            padding: 15px 35px;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            color: white;
-            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.5);
-        }
-
-        .btn-secondary {
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        .btn-secondary:hover {
-            background: #e0e0e0;
-            transform: translateY(-3px);
-        }
-
-        body.break-mode .btn-primary {
-            background: linear-gradient(135deg, #4ecdc4, #44a08d);
-            box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
-        }
-
-        body.break-mode .btn-primary:hover {
-            box-shadow: 0 12px 35px rgba(78, 205, 196, 0.5);
-        }
-
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 30px;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #ff6b6b;
-        }
-
-        body.break-mode .stat-number {
-            color: #4ecdc4;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #888;
-            font-weight: 500;
-        }
-
-        .settings {
-            background: #f8f9fa;
-            border-radius: 20px;
-            padding: 25px;
-        }
-
-        .settings h3 {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .setting-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .setting-label {
-            font-size: 1rem;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .setting-input {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .setting-input button {
-            width: 35px;
-            height: 35px;
-            border: none;
-            border-radius: 50%;
-            background: #e0e0e0;
-            color: #666;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .setting-input button:hover {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        body.break-mode .setting-input button:hover {
-            background: #4ecdc4;
-        }
-
-        .setting-input span {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #333;
-            min-width: 40px;
-            text-align: center;
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .time-text {
-                font-size: 2.8rem;
-            }
-
-            .timer-circle {
-                width: 200px;
-                height: 200px;
-            }
-
-            .btn {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
-
-            .stats {
-                gap: 25px;
-            }
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
             background: white;
             padding: 20px 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            display: none;
-            align-items: center;
-            gap: 15px;
-            animation: slideIn 0.5s ease;
-            z-index: 1000;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        h1 {
+            font-size: 24px;
+            color: #1a1a1a;
+            margin: 0 0 10px 0;
         }
-
-        .notification.show {
-            display: flex;
+        .btn {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
         }
-
-        .notification-icon {
-            font-size: 2rem;
+        .btn:hover {
+            background-color: #1d4ed8;
         }
-
-        .notification-text {
+        .btn:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+            min-height: 200px;
+        }
+        .loading {
+            color: #6b7280;
+            text-align: center;
+            padding: 40px;
+        }
+        .error {
+            color: #dc2626;
+            background-color: #fef2f2;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #dc2626;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background-color: #f9fafb;
             font-weight: 600;
-            color: #333;
+            color: #374151;
+        }
+        tr:hover {
+            background-color: #f9fafb;
+        }
+        .empty {
+            text-align: center;
+            color: #6b7280;
+            padding: 40px;
         }
     </style>
 </head>
 <body>
-    <div class="notification" id="notification">
-        <span class="notification-icon" id="notificationIcon">🔔</span>
-        <span class="notification-text" id="notificationText">时间到！</span>
+    <div class="header">
+        <h1>Bmob test 表数据查询</h1>
+        <button id="queryBtn" class="btn" onclick="queryData()">点击查询数据</button>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <h1><span class="tomato-icon">🍅</span> 番茄钟</h1>
-        </div>
-
-        <div class="mode-tabs">
-            <button class="mode-tab active" data-mode="work" onclick="switchMode('work')">工作</button>
-            <button class="mode-tab" data-mode="break" onclick="switchMode('break')">休息</button>
-        </div>
-
-        <div class="timer-display">
-            <div class="timer-circle">
-                <svg class="progress-ring" width="250" height="250">
-                    <circle class="progress-ring-circle" cx="125" cy="125" r="110"></circle>
-                    <circle class="progress-ring-circle-active" cx="125" cy="125" r="110" id="progressCircle"></circle>
-                </svg>
-                <div class="time-text" id="timeDisplay">25:00</div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <button class="btn btn-secondary" onclick="resetTimer()">
-                <span>🔄</span> 重置
-            </button>
-            <button class="btn btn-primary" id="startBtn" onclick="toggleTimer()">
-                <span id="startBtnIcon">▶️</span> <span id="startBtnText">开始</span>
-            </button>
-        </div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-number" id="pomodoroCount">0</div>
-                <div class="stat-label">完成番茄</div>
-            </div>
-        </div>
-
-        <div class="settings">
-            <h3>⚙️ 设置</h3>
-            <div class="setting-item">
-                <span class="setting-label">⏰ 工作时间</span>
-                <div class="setting-input">
-                    <button onclick="adjustTime('work', -5)">-</button>
-                    <span id="workTimeDisplay">25</span>
-                    <button onclick="adjustTime('work', 5)">+</button>
-                </div>
-            </div>
-            <div class="setting-item">
-                <span class="setting-label">☕ 休息时间</span>
-                <div class="setting-input">
-                    <button onclick="adjustTime('break', -1)">-</button>
-                    <span id="breakTimeDisplay">5</span>
-                    <button onclick="adjustTime('break', 1)">+</button>
-                </div>
-            </div>
-        </div>
+    <div class="content" id="resultArea">
+        <p style="color: #6b7280; text-align: center;">点击上方按钮查询 test 表数据</p>
     </div>
 
     <script>
-        let currentMode = 'work';
-        let workTime = 25 * 60;
-        let breakTime = 5 * 60;
-        let remainingTime = workTime;
-        let totalTime = workTime;
-        let timerInterval = null;
-        let isRunning = false;
-        let pomodoroCount = 0;
+        // ================= 请在此处配置你的 Bmob 密钥 =================
+        const APPLICATION_ID = "6a496fc036c469c5e3643e8b1c5a1e8d";  // 替换为你的 Application ID
+        const REST_API_KEY = "643e537279e51940a9642d729c378e63";      // 替换为你的 REST API Key
+        // ===============================================================
 
-        const timeDisplay = document.getElementById('timeDisplay');
-        const startBtn = document.getElementById('startBtn');
-        const startBtnIcon = document.getElementById('startBtnIcon');
-        const startBtnText = document.getElementById('startBtnText');
-        const progressCircle = document.getElementById('progressCircle');
-        const workTimeDisplay = document.getElementById('workTimeDisplay');
-        const breakTimeDisplay = document.getElementById('breakTimeDisplay');
-        const pomodoroCountDisplay = document.getElementById('pomodoroCount');
+        // 初始化 Bmob
+        Bmob.initialize(APPLICATION_ID, REST_API_KEY);
 
-        const circumference = 2 * Math.PI * 110;
-        progressCircle.style.strokeDasharray = circumference;
-        progressCircle.style.strokeDashoffset = 0;
+        /**
+         * 查询 test 表数据
+         */
+        async function queryData() {
+            const btn = document.getElementById('queryBtn');
+            const resultArea = document.getElementById('resultArea');
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
+            // 防止重复点击
+            btn.disabled = true;
+            resultArea.innerHTML = '<div class="loading">正在查询数据...</div>';
 
-        function updateDisplay() {
-            timeDisplay.textContent = formatTime(remainingTime);
-            const progress = remainingTime / totalTime;
-            progressCircle.style.strokeDashoffset = circumference * (1 - progress);
-        }
+            try {
+                // 创建查询对象，参数为表名
+                const query = Bmob.Query('test');
+                
+                // (可选) 设置查询条件，例如按创建时间倒序排列
+                query.order("-createdAt");
+                
+                // (可选) 设置返回条数，默认 10 条，最大 1000 条
+                // query.limit(50);
 
-        function toggleTimer() {
-            if (isRunning) {
-                pauseTimer();
-            } else {
-                startTimer();
+                // 执行查询
+                const results = await query.find();
+                
+                // 渲染结果
+                renderResults(results);
+
+            } catch (error) {
+                console.error('查询失败:', error);
+                resultArea.innerHTML = `
+                    <div class="error">
+                        <strong>查询失败</strong><br>
+                        错误信息: ${error.message || '未知错误'}<br>
+                        <small>请检查：1. 密钥是否正确 2. test 表是否存在 3. 表权限是否允许读取</small>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
             }
         }
 
-        function startTimer() {
-            isRunning = true;
-            startBtnIcon.textContent = '⏸️';
-            startBtnText.textContent = '暂停';
-            
-            timerInterval = setInterval(() => {
-                remainingTime--;
-                updateDisplay();
-                
-                if (remainingTime <= 0) {
-                    timerComplete();
-                }
-            }, 1000);
-        }
+        /**
+         * 渲染查询结果到表格
+         */
+        function renderResults(data) {
+            const resultArea = document.getElementById('resultArea');
 
-        function pauseTimer() {
-            isRunning = false;
-            startBtnIcon.textContent = '▶️';
-            startBtnText.textContent = '继续';
-            clearInterval(timerInterval);
-        }
+            if (!data || data.length === 0) {
+                resultArea.innerHTML = '<div class="empty">test 表中暂无数据</div>';
+                return;
+            }
 
-        function resetTimer() {
-            pauseTimer();
-            startBtnIcon.textContent = '▶️';
-            startBtnText.textContent = '开始';
-            remainingTime = currentMode === 'work' ? workTime : breakTime;
-            totalTime = remainingTime;
-            updateDisplay();
-        }
-
-        function switchMode(mode) {
-            pauseTimer();
-            currentMode = mode;
-            startBtnIcon.textContent = '▶️';
-            startBtnText.textContent = '开始';
-            
-            document.querySelectorAll('.mode-tab').forEach(tab => {
-                tab.classList.remove('active');
+            // 动态获取所有列名（排除 Bmob 内置字段，可选）
+            const allKeys = new Set();
+            data.forEach(item => {
+                Object.keys(item).forEach(key => {
+                    // 过滤掉 Bmob 内置的特殊字段，只保留自定义字段
+                    if (!['createdAt', 'updatedAt', 'objectId', 'ACL'].includes(key)) {
+                        allKeys.add(key);
+                    }
+                });
             });
-            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
-            
-            if (mode === 'break') {
-                document.body.classList.add('break-mode');
-                remainingTime = breakTime;
-            } else {
-                document.body.classList.remove('break-mode');
-                remainingTime = workTime;
-            }
-            
-            totalTime = remainingTime;
-            updateDisplay();
-        }
+            const columns = Array.from(allKeys);
 
-        function adjustTime(type, delta) {
-            if (type === 'work') {
-                const newTime = workTime / 60 + delta;
-                if (newTime >= 5 && newTime <= 60) {
-                    workTime = newTime * 60;
-                    workTimeDisplay.textContent = newTime;
-                    if (currentMode === 'work' && !isRunning) {
-                        remainingTime = workTime;
-                        totalTime = workTime;
-                        updateDisplay();
+            // 如果没有自定义字段，则显示所有字段
+            const displayColumns = columns.length > 0 ? columns : Object.keys(data[0]);
+
+            // 生成表格 HTML
+            let tableHtml = `
+                <p style="margin: 0 0 15px 0; color: #374151;">共查询到 <strong>${data.length}</strong> 条数据</p>
+                <table>
+                    <thead>
+                        <tr>
+                            ${displayColumns.map(col => `<th>${col}</th>`).join('')}
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            data.forEach(row => {
+                tableHtml += '<tr>';
+                displayColumns.forEach(col => {
+                    // 处理对象/数组类型的数据，转为字符串显示
+                    let value = row[col];
+                    if (typeof value === 'object' && value !== null) {
+                        value = JSON.stringify(value);
                     }
-                }
-            } else {
-                const newTime = breakTime / 60 + delta;
-                if (newTime >= 1 && newTime <= 30) {
-                    breakTime = newTime * 60;
-                    breakTimeDisplay.textContent = newTime;
-                    if (currentMode === 'break' && !isRunning) {
-                        remainingTime = breakTime;
-                        totalTime = breakTime;
-                        updateDisplay();
-                    }
-                }
-            }
-        }
+                    tableHtml += `<td>${value !== undefined ? value : ''}</td>`;
+                });
+                tableHtml += '</tr>';
+            });
 
-        function timerComplete() {
-            pauseTimer();
-            startBtnIcon.textContent = '▶️';
-            startBtnText.textContent = '开始';
-            
-            if (currentMode === 'work') {
-                pomodoroCount++;
-                pomodoroCountDisplay.textContent = pomodoroCount;
-                showNotification('🎉', '工作完成！该休息了！');
-                playAlarm();
-            } else {
-                showNotification('☕', '休息结束！开始工作吧！');
-                playAlarm();
-            }
+            tableHtml += '</tbody></table>';
+            resultArea.innerHTML = tableHtml;
         }
-
-        function playAlarm() {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            
-            function playBeep(frequency, duration, startTime) {
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = frequency;
-                oscillator.type = 'sine';
-                
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime + startTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration);
-                
-                oscillator.start(audioContext.currentTime + startTime);
-                oscillator.stop(audioContext.currentTime + startTime + duration);
-            }
-            
-            playBeep(880, 0.2, 0);
-            playBeep(880, 0.2, 0.25);
-            playBeep(880, 0.2, 0.5);
-            playBeep(1100, 0.4, 0.75);
-        }
-
-        function showNotification(icon, text) {
-            const notification = document.getElementById('notification');
-            const notificationIcon = document.getElementById('notificationIcon');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationIcon.textContent = icon;
-            notificationText.textContent = text;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 4000);
-        }
-
-        updateDisplay();
     </script>
 </body>
 </html>
